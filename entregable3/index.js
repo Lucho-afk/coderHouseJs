@@ -48,11 +48,11 @@ function mostarComida() {
             <div class="card-body">
                 <h5 class="card-title">${c.nombre}</h5>
                 <p class="card-text">${c.precio}$</p>
-                <button class="btn btn-primary" onClick="metodoDePago(1,${c.precio})">Efectivo</button>
+                <button class="btn btn-primary" onClick="metodoDePago(1,${c.precio})">Tarjeta</button>
                 <br>
-                <button class="btn btn-primary" onClick="metodoDePago(2,${c.precio})">Comprar</button>
+                <button class="btn btn-primary" onClick="metodoDePago(2,${c.precio})">Efectivo</button>
                 <br>
-                <button class="btn btn-primary" onClick="metodoDePago(3,${c.precio})">Comprar</button>
+                <button class="btn btn-primary" onClick="metodoDePago(3,${c.precio})">QR</button>
             </div>
         </div>
         
@@ -62,6 +62,7 @@ function mostarComida() {
 }
 
 function validador(numero) {
+  pago = 0;
   return isNaN(numero);
 }
 
@@ -102,24 +103,40 @@ function pagoConTarjeta() {
 
 function efectivo(precio) {
   let efectivoDelCliente = parseFloat(prompt("Ingrese su dinero"));
-  while (validador(efectivoDelCliente)) {
-    efectivoDelCliente = parseFloat(prompt("Ingrese otra ves por favor"));
-    validador(efectivoDelCliente)
-      ? alert("El numero ingresado es incorrecto")
-      : alert(calcularVuelto(efectivoDelCliente, precio));
+  if (validador(efectivoDelCliente)) {
+    //aca esta mal
+    alert("El numero ingresado es incorrecto");
+  } else {
+    //aca cuando esta bien
+    alert(calcularVuelto(efectivoDelCliente, precio));
   }
 }
 
-function calcularVuelto(efectivo, precio) {
-  let resta = precio - efectivo;
-  return 0 > resta
-    ? `Muchas gracias por su compra, su vuelto es: ${-1 * resta}$`
-    : `Su saldo es insuficiente, le falta: ${resta}$`;
+function calcularVuelto(efectivoDelCliente, precio) {
+  let pago = efectivoDelCliente;
+  let resta = precio - pago;
+  pago = 0;
+  let aux = 25;
+  while (resta > 0) {
+    if (
+      confirm(
+        `Su saldo es insuficiente, le falta: ${resta}$ ¿quiere agregar dinero?`
+      )
+    ) {
+      aux = parseFloat(prompt("Ingrese su dinero"));
+      if (validador(aux)) return "numero invalido reinicie la operacion";
+      pago = pago + aux;
+      resta = resta - pago;
+      pago = 0;
+    } else {
+      pago = 0;
+      return "adios";
+    }
+  }
+  pago = 0;
+  return `Muchas gracias por su compra, su vuelto es: ${-1 * resta}$`;
 }
 
-function segundoPago(resta) {
-  efectivo(resta);
-}
 /*------------------------------pago con qr-------------------------------------*/
 
 function pagoConQR() {
