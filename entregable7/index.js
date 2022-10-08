@@ -17,6 +17,8 @@ let MODAL_PRECIO_TOTAL = document.getElementById("precioTotal");
 let EFECTIVO_TOTAL = document.getElementById("totalAPagarEfectivo");
 let MODAL_BOTON_PAGAR = document.getElementById("moverAModalEfectivo");
 let EFECTIVO_BOTON_PAGAR = document.getElementById("pagoEnEfectivo");
+
+let QR_BOTON_PAGAR = document.getElementById("moverAModalQr");
 let comidas = [
   {
     id: 1,
@@ -164,6 +166,7 @@ MODAL_BOTON_PAGAR.addEventListener("click", () => {
       icon: "warning",
       title: "Movimiento invalido",
       text: "Todavia no ordenaste nada",
+      showConfirmButton: false,
     });
     setTimeout(() => {
       location.reload();
@@ -177,7 +180,7 @@ EFECTIVO_BOTON_PAGAR.addEventListener("click", () => {
   dinero = document.getElementById("inputDinero").value;
   console.log(dinero);
   if (!validador(dinero)) {
-    if (TOTAL - dinero < 0) {
+    if (TOTAL - dinero <= 0) {
       Swal.fire({
         icon: "success",
         title: calcularVuelto(dinero, TOTAL),
@@ -209,7 +212,7 @@ EFECTIVO_BOTON_PAGAR.addEventListener("click", () => {
 function calcularVuelto(efectivoDelCliente, precio) {
   let pago = efectivoDelCliente;
   let resta = precio - pago;
-  if (resta < 0) {
+  if (resta <= 0) {
     return `Muchas gracias por su compra, su vuelto es: ${-1 * resta}$`;
   } else {
     return `Saldo insuficiente`;
@@ -243,9 +246,21 @@ function calcularVuelto(efectivoDelCliente, precio) {
 }
 */
 /*------------------------------pago con qr(en construccion)-------------------------------------*/
-
+QR_BOTON_PAGAR.addEventListener("click", () => pagoConQR());
 function pagoConQR() {
-  //aca tengo que levantar un pop up con un qr ¿se podra hacer un generador de qr?
+  if (TOTAL == 0) {
+    TOTAL = "no ordenaste nada";
+  }
+  fetch(
+    `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${TOTAL}`
+  ).then((res) => {
+    console.log(res);
+    let QR_BODY = document.getElementById("qr");
+    QR_BODY.innerHTML = `<img src="${res.url}">`;
+  });
+  if (validador(TOTAL)) {
+    TOTAL = 0;
+  }
 }
 
 /*------------------------------levantar un modal(en construccion)-------------------------------*/
